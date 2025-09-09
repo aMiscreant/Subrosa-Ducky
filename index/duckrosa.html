@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DuckRosa C2</title>
+  <style>
+    body {
+      background: black;
+      color: #e0ff01;
+      font-family: monospace;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .term-container {
+      width: 48%;
+      float: left;
+      margin-right: 2%;
+    }
+
+    .terminal {
+      height: 45vh;
+      overflow-y: auto;
+      background: #000;
+      padding: 10px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      white-space: pre-wrap;
+    }
+
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+      margin-top: 10px;
+    }
+
+    .prompt {
+      position: absolute;
+      left: 10px;
+      color: #e0ff01;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .input-wrapper input[type="text"] {
+      padding-left: 100px;
+      background: #111;
+      color: #e0ff01;
+      border: 1px solid #333;
+      font-family: monospace;
+      width: 100%;
+      z-index: 1;
+    }
+
+    button {
+      background: #111;
+      color: #e1ff00;
+      border: 2px solid #333;
+      margin-left: 10px;
+    }
+
+    input[type="file"] {
+      background: #111;
+      color: #e1ff00;
+      border: 1px solid #333;
+      margin-top: 10px;
+    }
+
+    #serverCmdInput {
+      padding-left: 190px; /* Adjust for long prompt */
+    }
+
+    .clear {
+      clear: both;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Left: DuckRosa Terminal -->
+  <div class="term-container">
+    <div id="terminal" class="terminal">
+      <p>Connected to DuckRosa...</p>
+    </div>
+
+    <div class="input-wrapper">
+      <span class="prompt">DuckRosa &gt;</span>
+      <input type="text" id="cmdInput" placeholder="Type to Ducky" />
+      <button onclick="sendCmd()">Send</button>
+    </div>
+  </div>
+
+  <!-- Right: ServerShell Terminal -->
+  <div class="term-container">
+    <div id="serverTerminal" class="terminal">
+      <p>Connected to ServerShell...</p>
+    </div>
+
+    <div class="input-wrapper">
+      <span class="prompt">amiscreant💀duckrosa &gt;</span>
+      <input type="text" id="serverCmdInput" placeholder="Type to Server Shell" />
+      <button onclick="sendServerCmd()">Send</button>
+    </div>
+  </div>
+
+  <div class="clear"></div>
+  <div style="margin-top: 30px;">
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;">Pico</legend>
+      <button onclick="sendPicoCmdWithPayload('wifiScan')">WiFi [SCAN]</button>
+      <button onclick="sendPicoCmdWithPayload('bluetoothScan')">Bluetooth [SCAN]</button>
+      <button onclick="sendPicoCmdWithPayload('webServerStart')">Web Server [START]</button>
+      <button onclick="sendPicoCmdWithPayload('webServerStop')">Web Server [STOP]</button>
+      <button onclick="sendPicoCmdWithPayload('fakeApStart')">Fake AP [START]</button>
+      <button onclick="sendPicoCmdWithPayload('fakeApStop')">Fake AP [STOP]</button>
+      <button onclick="sendPicoCmdWithPayload('fakeApProtectedStart')">Fake AP Protected [START]</button>
+      <button onclick="sendPicoCmdWithPayload('fakeApProtectedStop')">Fake AP Protected [STOP]</button>
+      <button onclick="sendPicoCmdWithPayload('currentTime')">Duckrosa [TIME]</button>
+      <button onclick="sendPicoCmdWithPayload('clearMemory')">Duckrosa [FREE MEM]</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;">Server</legend>
+      <button onclick="sendServerCmdWithPayload('serverSleep')">Duckrosa [SLEEP]</button>
+      <button onclick="sendServerCmdWithPayload('serverDormant')">Duckrosa [DORMANT]</button>
+      <button onclick="sendServerCmdWithPayload('serverWakeUp')">Duckrosa [WAKE UP]</button>
+      <button onclick="sendServerCmdWithPayload('serverPivot')">Duckrosa [PIVOT]</button>
+      <button onclick="sendServerCmdWithPayload('serverKill')">Duckrosa [KILL]</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;">Remote-Exploitation</legend>
+      <button onclick="sendRemoteCmdWithPayload('remoteSleep')">Duckrosa [SLEEP]</button>
+      <button onclick="sendRemoteCmdWithPayload('remoteDormant')">Duckrosa [DORMANT]</button>
+      <button onclick="sendRemoteCmdWithPayload('remoteWakeUp')">Duckrosa [WAKE UP]</button>
+      <button onclick="sendRemoteCmdWithPayload('remoteInformationGathering')">Duckrosa [GATHER]</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;">Post-Exploitation</legend>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSleep')">Duckrosa [SLEEP]</button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationDormant')">Duckrosa [DORMANT]</button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationWakeUp')">Duckrosa [WAKE UP]</button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationPivot')">Duckrosa [PIVOT]</button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupDir')">Duckrosa [SETUP DIR]</button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupUser')">Duckrosa [CREATE USER]</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;">HID</legend>
+      <button onclick="sendHIDCmdWithPayload('android')">Android [HID]</button>
+      <button onclick="sendHIDCmdWithPayload('iphone')">IPhone [HID]</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px;">
+      <legend style="color: #e0ff01;">Upload HID</legend>
+      <input type="file" id="hidUploader" />
+      <button onclick="uploadBin()">Upload HID Payload</button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px;">
+      <legend style="color: #e0ff01;">Upload Bin</legend>
+      <input type="file" id="binUploader" />
+      <button onclick="uploadBin()">Upload Bin Payload</button>
+    </fieldset>
+  </div>
+
+  <script>
+    const API_KEY = "supersecretkey"; // must match Flask
+
+    const post_exploitation_payloads = {
+      postExploitationSleep: "post_exploitation_sleep",
+      postExploitationDormant: "post_exploitation_dormant",
+      postExploitationWakeUp: "post_exploitation_wake_up",
+      postExploitationPivot: "post_exploitation_pivot",
+      postExploitationSetupDir: "post_exploitation_setup_dir",
+      postExploitationSetupUser: "post_exploitation_setup_remote_user"
+    };
+
+    // Optional additional categories (kept for structure)
+    const server_payloads = {
+      serverSleep: "server_sleep",
+      serverDormant: "server_dormant",
+      serverWakeUp: "server_wake_up",
+      serverPivot: "server_pivot",
+      serverKill: "server_kill"
+    };
+
+    const server_hid_payloads = {
+      android: "android_hid",
+      iphone: "iphone_hid"
+    };
+
+    const pico_payloads = {
+      wifiScan: "wifi_scan",
+      bluetoothScan: "bluetooth_scan",
+      webServerStart: "web_server_start",
+      webServerStop: "web_server_stop",
+      fakeApStart: "fake_ap_start",
+      fakeApStop: "fake_ap_stop",
+      fakeApProtectedStart: "fake_ap_protected_start",
+      fakeApProtectedStop: "fake_ap_protected_stop",
+      currentTime: "server_time",
+      clearMemory: "clear_memory"
+    };
+
+    const remote_payloads = {
+      remoteSleep: "remote_sleep",
+      remoteDormant: "remote_dormant",
+      remoteWakeUp: "remote_wake_up",
+      remoteInformationGathering: "remote_information_gathering"
+    };
+
+    function pollResults() {
+      fetch("/getresults", {
+        method: "GET",
+        headers: {
+          "X-API-KEY": API_KEY
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result) {
+          const terminal = document.getElementById("terminal");
+          // append result as Pico output
+          terminal.innerHTML += `<p><span style="color:lime">[Pico]</span> ${data.result}</p>`;
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      })
+      .catch(err => console.error("Error fetching results:", err));
+    }
+
+    // poll every 3s
+    setInterval(pollResults, 3000);
+
+    function sendCmd() {
+      const cmd = document.getElementById("cmdInput").value;
+      if (!cmd) return;
+      fetch("/setcmd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({ command: cmd })
+      });
+      const terminal = document.getElementById("terminal");
+      terminal.innerHTML += `<p>DuckRosa &gt; ${cmd}</p>`;
+      document.getElementById("cmdInput").value = "";
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function sendPostExploitationCmdWithPayload(key) {
+      document.getElementById("cmdInput").value = post_exploitation_payloads[key];
+      sendCmd();
+    }
+
+    function sendServerCmdWithPayload(key) {
+      document.getElementById("cmdInput").value = server_payloads[key];
+      sendCmd();
+    }
+
+    function sendRemoteCmdWithPayload(key) {
+      document.getElementById("cmdInput").value = remote_payloads[key];
+      sendCmd();
+    }
+
+    function sendHIDCmdWithPayload(key) {
+      document.getElementById("cmdInput").value = server_hid_payloads[key];
+      sendCmd();
+    }
+
+    function sendPicoCmdWithPayload(key) {
+      document.getElementById("cmdInput").value = pico_payloads[key];
+      sendCmd();
+    }
+
+    function sendServerCmd() {
+      const cmd = document.getElementById("serverCmdInput").value;
+      if (!cmd) return;
+
+      serverHistory.push(cmd);
+      serverHistoryIndex = serverHistory.length;
+
+      const terminal = document.getElementById("serverTerminal");
+      terminal.innerHTML += `<p>amiscreant💀duckrosa &gt; ${cmd}</p>`;
+
+      fetch("/setcmd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({ command: cmd })
+      });
+
+      document.getElementById("serverCmdInput").value = "";
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function uploadBin() {
+      const file = document.getElementById("binUploader").files[0];
+      if (!file) return;
+      alert("Binary upload placeholder — integrate later.");
+    }
+
+    let serverHistory = [];
+    let serverHistoryIndex = -1;
+
+    document.getElementById("serverCmdInput").addEventListener("keydown", function(e) {
+      if (e.key === "ArrowUp") {
+        if (serverHistoryIndex > 0) {
+          serverHistoryIndex--;
+          this.value = serverHistory[serverHistoryIndex];
+        }
+        e.preventDefault();
+      } else if (e.key === "ArrowDown") {
+        if (serverHistoryIndex < serverHistory.length - 1) {
+          serverHistoryIndex++;
+          this.value = serverHistory[serverHistoryIndex] || "";
+        }
+        e.preventDefault();
+      } else if (e.key === "Enter") {
+        sendServerCmd();
+      }
+    });
+    function handleLocalServerCmd(cmd) {
+      const terminal = document.getElementById("serverTerminal");
+      if (cmd === "help") {
+        terminal.innerHTML += `<p>All Help Options: </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p>help duckrosa - Display Pico Commands</p>`;
+        terminal.innerHTML += `<p>help server   - Display Server Commands</p>`;
+        terminal.innerHTML += `<p>help remote_payloads - Display Remote Payload Options</p>`;
+        terminal.innerHTML += `<p>help post_exploitation_payloads - Display Post Exploitation Payload Options</p>`;
+        terminal.innerHTML += `<p>help hid_payloads - Display HID Payload Options</p>`;
+        terminal.innerHTML += `<p>help menu     - Display Menu Options</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>Available commands: help, help duckrosa, help server, help remote_payloads,           </p>`;
+        terminal.innerHTML += `<p>help post_exploitation_payloads, help hid_payloads, help menu </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help server") {
+        terminal.innerHTML += `<p>Server Help Commands: </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> sleep: Using the sleep command the server will sleep, NOT disconnecting</p>`;
+        terminal.innerHTML += `<p>        from the current network. It will not handle commands during that time.</p>`;
+        terminal.innerHTML += `<p> Example: </p>`;
+        terminal.innerHTML += `<p>         sleep 30 </p>`;
+        terminal.innerHTML += `<p> Will cause the Pico to sleep for 30 seconds. </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> dormant: Using the dormant command causes all Connections to be dropped until</p>`;
+        terminal.innerHTML += `<p>          the Pico W detects a certain network name and payload SSID-{base64_payload}. </p>`;
+        terminal.innerHTML += `<p>  Example: </p>`;
+        terminal.innerHTML += `<p>          dormant stealth</p>`;
+        terminal.innerHTML += `<p>                  {stealth} is the variable name and must match 'wake_up' command. </p>`;
+        terminal.innerHTML += `<p> Will cause the Pico to remain dormant until it detects an SSID with a base64 payload </p>`;
+        terminal.innerHTML += `<p> matching the passed variable {stealth} </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> wake_up: Using the wake_up command causes a Fake AP to start using the passed variable</p>`;
+        terminal.innerHTML += `<p> Example:</p>`;
+        terminal.innerHTML += `<p>         wake_up stealth</p>`;
+        terminal.innerHTML += `<p>                 {stealth} is the variable name it must match dormant to wake up the Pico W.</p>`;
+        terminal.innerHTML += `<p> Will cause a Fake AP to start using the passed variable to append to the Network name </p>`;
+        terminal.innerHTML += `<p> Example network name DuckRosa-fTT4fg=, {fTT4fg=} being the base64 payload for the Pico W. </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> pivot: </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> kill:</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> on_connect:</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>Server commands: sleep, dormant, wake_up, pivot, kill, on_connect</p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help remote_payloads") {
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help post_exploitation_payloads") {
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help hid_payloads") {
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help duckrosa") {
+        terminal.innerHTML += `<p>DuckRosa - Pico: </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> The Commands are directly used on Pico W. </p>`;
+        terminal.innerHTML += `<p> These will not run on Remote Machines. </p>`;
+        terminal.innerHTML += `<p> All Information is sent back to the server. </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> wifi_scan        - WiFi Scan, will scan for local Network Connections.</p>`;
+        terminal.innerHTML += `<p> bluetooth_scan   - Bluetooth Scan, will scan for nearby activate bluetooth devices.</p>`;
+        terminal.innerHTML += `<p> web_server_start - WebServer Start, starts the webserver.</p>`;
+        terminal.innerHTML += `<p> web_server_stop  - WebServer Stop, stops the webserver.</p>`;
+        terminal.innerHTML += `<p> fake_ap_start    - Fake AP Start, starts the fake access point.</p>`;
+        terminal.innerHTML += `<p> fake_ap_stop     - Fake AP Stop, stops the fake access point. </p>`;
+        terminal.innerHTML += `<p> clear_memory     - Clear Memory, Frees memory on the Pico W.</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p>DuckRosa Pico controls: wifi_scan, bluetooth_scan, web_server_start, web_server_stop, </p>`;
+        terminal.innerHTML += `<p>                        fake_ap_start, fake_ap_stop, fake_ap_protected_start,         </p>`;
+        terminal.innerHTML += `<p>                        fake_ap_protected_stop, clear_memory                          </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        return true;
+      }
+      if (cmd === "help menu") {
+        terminal.innerHTML += `<p>Use the right-side buttons or type help for commands.</p>`;
+        return true;
+      }
+      return false;
+    }
+
+    function sendServerCmd() {
+      const cmd = document.getElementById("serverCmdInput").value;
+      if (!cmd) return;
+
+      serverHistory.push(cmd);
+      serverHistoryIndex = serverHistory.length;
+
+      const terminal = document.getElementById("serverTerminal");
+      terminal.innerHTML += `<p>amiscreant💀duckrosa &gt; ${cmd}</p>`;
+
+      // Check if local help/menu
+      if (handleLocalServerCmd(cmd)) {
+        document.getElementById("serverCmdInput").value = "";
+        terminal.scrollTop = terminal.scrollHeight;
+        return;
+      }
+
+      // Otherwise forward to backend
+      fetch("/setcmd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({ command: cmd })
+      });
+
+      document.getElementById("serverCmdInput").value = "";
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+  </script>
+</body>
+</html>
