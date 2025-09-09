@@ -1,0 +1,3 @@
+[submodule "DuckRosa"]
+	path = DuckRosa
+	url = https://github.com/aMiscreant/Subrosa-Pico.git
