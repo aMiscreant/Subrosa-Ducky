@@ -185,7 +185,6 @@
       <button onclick="sendServerCmdWithPayload('serverDormant')"><b>Duckrosa [DORMANT]</b></button>
       <button onclick="sendServerCmdWithPayload('serverWakeUp')"><b>Duckrosa [WAKE UP]</b></button>
       <button onclick="sendServerCmdWithPayload('serverPivot')"><b>Duckrosa [PIVOT]</b></button>
-      <button onclick="sendServerCmdWithPayload('serverKill')"><b>Duckrosa [KILL]</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
@@ -249,8 +248,7 @@
       serverSleep: "server_sleep",
       serverDormant: "server_dormant",
       serverWakeUp: "server_wake_up",
-      serverPivot: "server_pivot",
-      serverKill: "server_kill"
+      serverPivot: "server_pivot"
     };
 
     const server_hid_payloads = {
@@ -438,41 +436,11 @@
         terminal.innerHTML += `<p>Server Help Commands: </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p> sleep: Using the sleep command the server will sleep, NOT disconnecting</p>`;
-        terminal.innerHTML += `<p>        from the current network. It will not handle commands during that time.</p>`;
-        terminal.innerHTML += `<p> Example: </p>`;
-        terminal.innerHTML += `<p>         sleep 30 </p>`;
-        terminal.innerHTML += `<p> Will cause the Pico to sleep for 30 seconds. </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> dormant: Using the dormant command causes all Connections to be dropped until</p>`;
-        terminal.innerHTML += `<p>          the Pico W detects a certain network name and payload SSID-{base64_payload}. </p>`;
-        terminal.innerHTML += `<p>  Example: </p>`;
-        terminal.innerHTML += `<p>          dormant stealth</p>`;
-        terminal.innerHTML += `<p>                  {stealth} is the variable name and must match 'wake_up' command. </p>`;
-        terminal.innerHTML += `<p> Will cause the Pico to remain dormant until it detects an SSID with a base64 payload </p>`;
-        terminal.innerHTML += `<p> matching the passed variable {stealth} </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> wake_up: Using the wake_up command causes a Fake AP to start using the passed variable</p>`;
-        terminal.innerHTML += `<p> Example:</p>`;
-        terminal.innerHTML += `<p>         wake_up stealth</p>`;
-        terminal.innerHTML += `<p>                 {stealth} is the variable name it must match dormant to wake up the Pico W.</p>`;
-        terminal.innerHTML += `<p> Will cause a Fake AP to start using the passed variable to append to the Network name </p>`;
-        terminal.innerHTML += `<p> Example network name DuckRosa-fTT4fg=, {fTT4fg=} being the base64 payload for the Pico W. </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> pivot: </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> kill:</p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> on_connect:</p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>Server commands: sleep, dormant, wake_up, pivot, kill, on_connect</p>`;
+        terminal.innerHTML += `<p><b>Server commands: server_sleep, server_dormant, server_wake_up</b> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -483,7 +451,7 @@
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p><b>Payloads: setup_dir, setup_remote_user, remote_information_gathering</b></p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -493,8 +461,11 @@
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p><b>Payloads: setup_dir, setup_remote_user, remote_information_gathering</b></p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -502,10 +473,13 @@
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> <b>android_hid  - Trigger selected android HID Payload upon USB connection.</b></p>`;
+        terminal.innerHTML += `<p> <b>iphone_hid   - Trigger selected iphone HID Payload upon USB connection.</b></p>`;
+        terminal.innerHTML += `<p> <b>linux_hid    - Trigger selected linux HID Payload upon USB connection.</b></p>`;
+        terminal.innerHTML += `<p> <b>windows_hid  - Trigger selected windows HID Payload upon USB connection.</b></p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>Payloads: setup_dir, setup_remote_user, remote_information_gathering</p>`;
+        terminal.innerHTML += `<p><b>Payloads: android_hid, iphone_hid, linux_hid, windows_hid </b></p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -516,6 +490,7 @@
         terminal.innerHTML += `<p> <i>These will not run on Remote Machines.</i> </p>`;
         terminal.innerHTML += `<p> <i>All Information is sent back to the server.</i> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> <b>wifi_scan         - WiFi Scan, will scan for local Network Connections.</b>             </p>`;
         terminal.innerHTML += `<p> <b>bluetooth_scan    - Bluetooth Scan, will scan for nearby activate bluetooth devices.</b></p>`;
         terminal.innerHTML += `<p> <b>web_server_start  - WebServer Start, starts the webserver.</b>                          </p>`;
@@ -524,6 +499,7 @@
         terminal.innerHTML += `<p> <b>fake_ap_stop      - Fake AP Stop, stops the fake access point.</b>                      </p>`;
         terminal.innerHTML += `<p> <b>gatt_server_start - GATT Server start on the Pico W.</b>                                </p>`;
         terminal.innerHTML += `<p> <b>gatt_server_stop  - GATT Server stop on the Pico W.</b>                                 </p>`;
+        terminal.innerHTML += `<p> <b>fetch_nuke        - Downloads nuke.uf2 to reset the Pico W.</b></p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         terminal.innerHTML += `<p><b>DuckRosa Pico controls: wifi_scan, bluetooth_scan, web_server_start, web_server_stop,</b>  </p>`;
@@ -533,7 +509,7 @@
         return true;
       }
       if (cmd === "help menu") {
-        terminal.innerHTML += `<p>Use the right-side buttons or type help for commands.</p>`;
+        terminal.innerHTML += `<p><b>Use the C2 buttons or type help for commands.</b></p>`;
         return true;
       }
       return false;

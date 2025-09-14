@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask import send_from_directory
 
 app = Flask(__name__)
+
 last_command = "" # store last command sent
 last_result = ""  # store most recent Pico output
 

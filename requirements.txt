@@ -1,3 +1,4 @@
 Flask~=3.1.2
 network~=0.1
 urequests~=0.1.2
+scapy~=2.6.1
