@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>DuckRosa C2</title>
+  <title>Subrosa Ducky C2</title>
   <style>
     body {
       background: black;
@@ -12,9 +12,17 @@
     }
 
     .term-container {
-      width: 48%;
+      width: 47.6%;
       float: left;
       margin-right: 2%;
+      border: 2px solid #333;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #e0ff0033;
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .term-container:hover {
+      box-shadow: 0 0 20px #e0ff01, 0 0 30px #ffff66;
     }
 
     .terminal {
@@ -25,6 +33,7 @@
       border: 2px solid #333;
       border-radius: 10px;
       white-space: pre-wrap;
+      box-shadow: inset 0 0 5px #e0ff0033;
     }
 
     .input-wrapper {
@@ -40,6 +49,7 @@
       color: #e0ff01;
       pointer-events: none;
       z-index: 2;
+      text-shadow: 0 0 5px #ffff66;
     }
 
     .input-wrapper input[type="text"] {
@@ -50,20 +60,37 @@
       font-family: monospace;
       width: 100%;
       z-index: 1;
+      box-shadow: inset 0 0 5px #e0ff0033;
+      transition: all 0.2s ease-in-out;
+    }
+
+    .input-wrapper input[type="text"]:focus {
+      box-shadow: inset 0 0 10px #e0ff33, 0 0 10px #ffff66;
+      outline: none;
     }
 
     button {
       background: #111;
       color: #e1ff00;
-      border: 2px solid #333;
+      border: 2px solid #e1ff00;
       margin-left: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 5px #e1ff00, 0 0 10px #ffff33;
+    }
+
+    button:hover {
+      box-shadow: 0 0 15px #e1ff00, 0 0 25px #ffff33;
+      transform: scale(1.05);
     }
 
     input[type="file"] {
       background: #111;
       color: #e1ff00;
-      border: 1px solid #333;
+      border: 1px solid #e1ff00;
       margin-top: 10px;
+      box-shadow: 0 0 5px #e1ff0033;
     }
 
     #serverCmdInput {
@@ -73,13 +100,45 @@
     .clear {
       clear: both;
     }
+
+    /* NUKE button specific styling */
+    .nuke-btn {
+      background: linear-gradient(45deg, #ff0000, #990000);
+      color: #fff;
+      border: 2px solid #ff0000;
+      box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4444, 0 0 30px #ff6666;
+      font-weight: bold;
+      text-transform: uppercase;
+      animation: pulse 1.5s infinite;
+    }
+
+    .nuke-btn:hover {
+      box-shadow: 0 0 15px #ff0000, 0 0 30px #ff4444, 0 0 45px #ff6666;
+      transform: scale(1.05);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 5px #ff0000, 0 0 10px #ff4444, 0 0 15px #ff6666; }
+      50% { box-shadow: 0 0 15px #ff0000, 0 0 30px #ff4444, 0 0 45px #ff6666; }
+      100% { box-shadow: 0 0 5px #ff0000, 0 0 10px #ff4444, 0 0 15px #ff6666; }
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #888;
+      font-size: 0.9em;
+      text-shadow: 0 0 5px #444;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Left: DuckRosa Terminal -->
   <div class="term-container">
     <div id="terminal" class="terminal">
+      <!-- ToDo if connected change on GET Connected from pico -->
       <p>Connected to DuckRosa...</p>
     </div>
 
@@ -93,7 +152,9 @@
   <!-- Right: ServerShell Terminal -->
   <div class="term-container">
     <div id="serverTerminal" class="terminal">
-      <p>Connected to ServerShell...</p>
+      <!-- ToDo add enable / disable Terminal {Host Machine} RISKS! but handy... -->
+      <!-- ToDo If enabled Change turn to green from static red for disabled -->
+      <p>Server Shell Disabled...</p>
     </div>
 
     <div class="input-wrapper">
@@ -106,62 +167,68 @@
   <div class="clear"></div>
   <div style="margin-top: 30px;">
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
-      <legend style="color: #e0ff01;">Pico</legend>
-      <button onclick="sendPicoCmdWithPayload('wifiScan')">WiFi [SCAN]</button>
-      <button onclick="sendPicoCmdWithPayload('bluetoothScan')">Bluetooth [SCAN]</button>
-      <button onclick="sendPicoCmdWithPayload('webServerStart')">Web Server [START]</button>
-      <button onclick="sendPicoCmdWithPayload('webServerStop')">Web Server [STOP]</button>
-      <button onclick="sendPicoCmdWithPayload('fakeApStart')">Fake AP [START]</button>
-      <button onclick="sendPicoCmdWithPayload('fakeApStop')">Fake AP [STOP]</button>
-      <button onclick="sendPicoCmdWithPayload('fakeApProtectedStart')">Fake AP Protected [START]</button>
-      <button onclick="sendPicoCmdWithPayload('fakeApProtectedStop')">Fake AP Protected [STOP]</button>
-      <button onclick="sendPicoCmdWithPayload('currentTime')">Duckrosa [TIME]</button>
-      <button onclick="sendPicoCmdWithPayload('clearMemory')">Duckrosa [FREE MEM]</button>
+      <legend style="color: #e0ff01;"><b>Pico</b></legend>
+      <button onclick="sendPicoCmdWithPayload('wifiScan')"><b>WiFi [SCAN]</b></button>
+      <button onclick="sendPicoCmdWithPayload('bluetoothScan')"><b>Bluetooth [SCAN]</b></button>
+      <button onclick="sendPicoCmdWithPayload('webServerStart')"><b>Web Server [START]</b></button>
+      <button onclick="sendPicoCmdWithPayload('webServerStop')"><b>Web Server [STOP]</b></button>
+      <button onclick="sendPicoCmdWithPayload('fakeApStart')"><b>Fake AP [START]</b></button>
+      <button onclick="sendPicoCmdWithPayload('fakeApStop')"><b>Fake AP [STOP]</b></button>
+      <button onclick="sendPicoCmdWithPayload('gattServerStart')"><b>GATT Server [START]</b></button>
+      <button onclick="sendPicoCmdWithPayload('gattServerStop')"><b>GATT Server [STOP]</b></button>
+      <button onclick="sendPicoCmdWithPayload('currentTime')"><b>Duckrosa [TIME]</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
-      <legend style="color: #e0ff01;">Server</legend>
-      <button onclick="sendServerCmdWithPayload('serverSleep')">Duckrosa [SLEEP]</button>
-      <button onclick="sendServerCmdWithPayload('serverDormant')">Duckrosa [DORMANT]</button>
-      <button onclick="sendServerCmdWithPayload('serverWakeUp')">Duckrosa [WAKE UP]</button>
-      <button onclick="sendServerCmdWithPayload('serverPivot')">Duckrosa [PIVOT]</button>
-      <button onclick="sendServerCmdWithPayload('serverKill')">Duckrosa [KILL]</button>
+      <legend style="color: #e0ff01;"><b>Server</b></legend>
+      <button onclick="sendServerCmdWithPayload('serverSleep')"><b>Duckrosa [SLEEP]</b></button>
+      <button onclick="sendServerCmdWithPayload('serverDormant')"><b>Duckrosa [DORMANT]</b></button>
+      <button onclick="sendServerCmdWithPayload('serverWakeUp')"><b>Duckrosa [WAKE UP]</b></button>
+      <button onclick="sendServerCmdWithPayload('serverPivot')"><b>Duckrosa [PIVOT]</b></button>
+      <button onclick="sendServerCmdWithPayload('serverKill')"><b>Duckrosa [KILL]</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
-      <legend style="color: #e0ff01;">Remote-Exploitation</legend>
-      <button onclick="sendRemoteCmdWithPayload('remoteSleep')">Duckrosa [SLEEP]</button>
-      <button onclick="sendRemoteCmdWithPayload('remoteDormant')">Duckrosa [DORMANT]</button>
-      <button onclick="sendRemoteCmdWithPayload('remoteWakeUp')">Duckrosa [WAKE UP]</button>
-      <button onclick="sendRemoteCmdWithPayload('remoteInformationGathering')">Duckrosa [GATHER]</button>
+      <legend style="color: #e0ff01;"><b>Remote-Exploitation</b></legend>
+      <button onclick="sendRemoteCmdWithPayload('remoteSleep')"><b>Duckrosa [SLEEP]</b></button>
+      <button onclick="sendRemoteCmdWithPayload('remoteDormant')"><b>Duckrosa [DORMANT]</b></button>
+      <button onclick="sendRemoteCmdWithPayload('remoteWakeUp')"><b>Duckrosa [WAKE UP]</b></button>
+      <button onclick="sendRemoteCmdWithPayload('remoteInformationGathering')"><b>Duckrosa [GATHER]</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
-      <legend style="color: #e0ff01;">Post-Exploitation</legend>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSleep')">Duckrosa [SLEEP]</button>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationDormant')">Duckrosa [DORMANT]</button>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationWakeUp')">Duckrosa [WAKE UP]</button>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationPivot')">Duckrosa [PIVOT]</button>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupDir')">Duckrosa [SETUP DIR]</button>
-      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupUser')">Duckrosa [CREATE USER]</button>
+      <legend style="color: #e0ff01;"><b>Post-Exploitation</b></legend>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSleep')"><b>Duckrosa [SLEEP]</b></button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationDormant')"><b>Duckrosa [DORMANT]</b></button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationWakeUp')"><b>Duckrosa [WAKE UP]</b></button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationPivot')"><b>Duckrosa [PIVOT]</b></button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupDir')"><b>Duckrosa [SETUP DIR]</b></button>
+      <button onclick="sendPostExploitationCmdWithPayload('postExploitationSetupUser')"><b>Duckrosa [CREATE USER]</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
-      <legend style="color: #e0ff01;">HID</legend>
-      <button onclick="sendHIDCmdWithPayload('android')">Android [HID]</button>
-      <button onclick="sendHIDCmdWithPayload('iphone')">IPhone [HID]</button>
+      <legend style="color: #e0ff01;"><b>HID</b></legend>
+      <button onclick="sendHIDCmdWithPayload('android')"><b>Android [HID]</b></button>
+      <button onclick="sendHIDCmdWithPayload('iphone')"><b>IPhone [HID]</b></button>
+      <button onclick="sendHIDCmdWithPayload('linux')"><b>Linux [HID]</b></button>
+      <button onclick="sendHIDCmdWithPayload('windows')"><b>Windows [HID]</b></button>
+    </fieldset>
+
+    <fieldset style="border: 2px solid #333; padding: 10px; margin-bottom: 20px;">
+      <legend style="color: #e0ff01;"><b>NUKE</b></legend>
+      <button class="nuke-btn" onclick="sendPicoCmdWithPayload('fetchNuke')">Duckrosa [NUKE]</button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px;">
-      <legend style="color: #e0ff01;">Upload HID</legend>
+      <legend style="color: #e0ff01;"><b>Upload HID</b></legend>
       <input type="file" id="hidUploader" />
-      <button onclick="uploadBin()">Upload HID Payload</button>
+      <button onclick="uploadBin()"><b>Upload HID Payload</b></button>
     </fieldset>
 
     <fieldset style="border: 2px solid #333; padding: 10px;">
-      <legend style="color: #e0ff01;">Upload Bin</legend>
+      <legend style="color: #e0ff01;"><b>Upload Bin</b></legend>
       <input type="file" id="binUploader" />
-      <button onclick="uploadBin()">Upload Bin Payload</button>
+      <button onclick="uploadBin()"><b>Upload Bin Payload</b></button>
     </fieldset>
   </div>
 
@@ -188,7 +255,9 @@
 
     const server_hid_payloads = {
       android: "android_hid",
-      iphone: "iphone_hid"
+      iphone: "iphone_hid",
+      linux: "linux_hid",
+      windows: "windows_hid"
     };
 
     const pico_payloads = {
@@ -198,10 +267,10 @@
       webServerStop: "web_server_stop",
       fakeApStart: "fake_ap_start",
       fakeApStop: "fake_ap_stop",
-      fakeApProtectedStart: "fake_ap_protected_start",
-      fakeApProtectedStop: "fake_ap_protected_stop",
+      gattServerStart: "bluetooth_gatt_start",
+      gattServerStop: "bluetooth_gatt_stop",
       currentTime: "server_time",
-      clearMemory: "clear_memory"
+      fetchNuke: "fetch_nuke"
     };
 
     const remote_payloads = {
@@ -222,8 +291,8 @@
       .then(data => {
         if (data.result) {
           const terminal = document.getElementById("terminal");
-          // append result as Pico output
-          terminal.innerHTML += `<p><span style="color:lime">[Pico]</span> ${data.result}</p>`;
+          const isError = data.result.toLowerCase().includes("error") || data.result.includes("💀");
+          terminal.innerHTML += `<p><span style="color:${isError ? "red" : "lime"}">[Pico]</span> ${data.result}</p>`;
           terminal.scrollTop = terminal.scrollHeight;
         }
       })
@@ -298,10 +367,32 @@
       terminal.scrollTop = terminal.scrollHeight;
     }
 
-    function uploadBin() {
+    async function uploadBin() {
       const file = document.getElementById("binUploader").files[0];
-      if (!file) return;
-      alert("Binary upload placeholder — integrate later.");
+      if (!file) {
+        alert("Please select a .uf2 or .bin file first!");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("binfile", file);
+
+      try {
+        const res = await fetch("/uploadbin", {
+          method: "POST",
+          headers: { "X-API-KEY": API_KEY },
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          alert("Upload successful: " + data.filename);
+        } else {
+          alert("Upload failed: " + res.status);
+        }
+      } catch (err) {
+        alert("Error: " + err);
+      }
     }
 
     let serverHistory = [];
@@ -327,19 +418,19 @@
     function handleLocalServerCmd(cmd) {
       const terminal = document.getElementById("serverTerminal");
       if (cmd === "help") {
-        terminal.innerHTML += `<p>All Help Options: </p>`;
+        terminal.innerHTML += `<p><b>All Help Options: </b></p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         terminal.innerHTML += `<p> </p>`;
-        terminal.innerHTML += `<p>help duckrosa - Display Pico Commands</p>`;
-        terminal.innerHTML += `<p>help server   - Display Server Commands</p>`;
-        terminal.innerHTML += `<p>help remote_payloads - Display Remote Payload Options</p>`;
-        terminal.innerHTML += `<p>help post_exploitation_payloads - Display Post Exploitation Payload Options</p>`;
-        terminal.innerHTML += `<p>help hid_payloads - Display HID Payload Options</p>`;
-        terminal.innerHTML += `<p>help menu     - Display Menu Options</p>`;
+        terminal.innerHTML += `<p><b>help duckrosa                   - Display Pico Commands</b>                        </p>`;
+        terminal.innerHTML += `<p><b>help server                     - Display Server Commands</b>                      </p>`;
+        terminal.innerHTML += `<p><b>help remote_payloads            - Display Remote Payload Options</b>               </p>`;
+        terminal.innerHTML += `<p><b>help post_exploitation_payloads - Display Post Exploitation Payload Options</b>    </p>`;
+        terminal.innerHTML += `<p><b>help hid_payloads               - Display HID Payload Options</b>                  </p>`;
+        terminal.innerHTML += `<p><b>help menu                       - Display Menu Options</b>                         </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>Available commands: help, help duckrosa, help server, help remote_payloads,           </p>`;
-        terminal.innerHTML += `<p>help post_exploitation_payloads, help hid_payloads, help menu </p>`;
+        terminal.innerHTML += `<p><b>Available commands: help, help duckrosa, help server, help remote_payloads,</b>    </p>`;
+        terminal.innerHTML += `<p><b>help post_exploitation_payloads, help hid_payloads, help menu </b>                 </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -421,22 +512,23 @@
       if (cmd === "help duckrosa") {
         terminal.innerHTML += `<p>DuckRosa - Pico: </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p> The Commands are directly used on Pico W. </p>`;
-        terminal.innerHTML += `<p> These will not run on Remote Machines. </p>`;
-        terminal.innerHTML += `<p> All Information is sent back to the server. </p>`;
+        terminal.innerHTML += `<p> <i>These Commands are directly used on</i> <b>Pico W./DuckRosa</b> </p>`;
+        terminal.innerHTML += `<p> <i>These will not run on Remote Machines.</i> </p>`;
+        terminal.innerHTML += `<p> <i>All Information is sent back to the server.</i> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p> wifi_scan        - WiFi Scan, will scan for local Network Connections.</p>`;
-        terminal.innerHTML += `<p> bluetooth_scan   - Bluetooth Scan, will scan for nearby activate bluetooth devices.</p>`;
-        terminal.innerHTML += `<p> web_server_start - WebServer Start, starts the webserver.</p>`;
-        terminal.innerHTML += `<p> web_server_stop  - WebServer Stop, stops the webserver.</p>`;
-        terminal.innerHTML += `<p> fake_ap_start    - Fake AP Start, starts the fake access point.</p>`;
-        terminal.innerHTML += `<p> fake_ap_stop     - Fake AP Stop, stops the fake access point. </p>`;
-        terminal.innerHTML += `<p> clear_memory     - Clear Memory, Frees memory on the Pico W.</p>`;
+        terminal.innerHTML += `<p> <b>wifi_scan         - WiFi Scan, will scan for local Network Connections.</b>             </p>`;
+        terminal.innerHTML += `<p> <b>bluetooth_scan    - Bluetooth Scan, will scan for nearby activate bluetooth devices.</b></p>`;
+        terminal.innerHTML += `<p> <b>web_server_start  - WebServer Start, starts the webserver.</b>                          </p>`;
+        terminal.innerHTML += `<p> <b>web_server_stop   - WebServer Stop, stops the webserver.</b>                            </p>`;
+        terminal.innerHTML += `<p> <b>fake_ap_start     - Fake AP Start, starts the fake access point.</b>                    </p>`;
+        terminal.innerHTML += `<p> <b>fake_ap_stop      - Fake AP Stop, stops the fake access point.</b>                      </p>`;
+        terminal.innerHTML += `<p> <b>gatt_server_start - GATT Server start on the Pico W.</b>                                </p>`;
+        terminal.innerHTML += `<p> <b>gatt_server_stop  - GATT Server stop on the Pico W.</b>                                 </p>`;
         terminal.innerHTML += `<p> </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
-        terminal.innerHTML += `<p>DuckRosa Pico controls: wifi_scan, bluetooth_scan, web_server_start, web_server_stop, </p>`;
-        terminal.innerHTML += `<p>                        fake_ap_start, fake_ap_stop, fake_ap_protected_start,         </p>`;
-        terminal.innerHTML += `<p>                        fake_ap_protected_stop, clear_memory                          </p>`;
+        terminal.innerHTML += `<p><b>DuckRosa Pico controls: wifi_scan, bluetooth_scan, web_server_start, web_server_stop,</b>  </p>`;
+        terminal.innerHTML += `<p>                        <b>fake_ap_start, fake_ap_stop, gatt_server_start,</b>                </p>`;
+        terminal.innerHTML += `<p>                        <b>gatt_server_stop</b>                                               </p>`;
         terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
         return true;
       }
@@ -478,5 +570,6 @@
       terminal.scrollTop = terminal.scrollHeight;
     }
   </script>
+<footer>aMiscreant</footer>
 </body>
 </html>
