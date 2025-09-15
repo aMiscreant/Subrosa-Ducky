@@ -1,0 +1,2 @@
+- [micropython.uf2] https://micropython.org/download/RPI_PICO_W/
+- [nuke.uf2] 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # aMiscreant
 import os
 import subprocess
@@ -75,7 +76,7 @@ def upload_bin():
 
 
 @app.route("/firmware/<path:filename>", methods=["GET"])
-@require_key  # keep it protected
+@require_key # require key
 def firmware_files(filename):
     """
     Serve files from the firmware directory.
@@ -84,7 +85,7 @@ def firmware_files(filename):
     return send_from_directory(UPLOAD_DIR, filename, as_attachment=True)
 
 @app.route("/terminalcmd", methods=["POST"])
-@require_key
+@require_key # require key
 def terminal_cmd():
     """
     Handle raw input typed into the server shell.
@@ -108,14 +109,14 @@ def terminal_cmd():
     return jsonify({"status": "ok"})
 
 @app.route("/exec", methods=["POST"])
-@require_key
+@require_key # require key
 def exec_command():
     global server_shell_enabled
     data = request.json
     cmd = data.get("command", "")
 
     if not server_shell_enabled:
-        return jsonify({"output": "💀 Server shell is DISABLED. Use enable_shell first."})
+        return jsonify({"output": "Server shell is DISABLED. Use enable_shell first."})
 
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)

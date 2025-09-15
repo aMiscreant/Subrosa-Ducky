@@ -22,14 +22,15 @@ from flask import Flask, request, jsonify, send_from_directory
 # -----------------------------
 app = Flask(__name__)
 
+API_KEY = "supersecretkey"  # store safely, not in code ToDo
 last_command = "" # store last command sent
 last_result = ""  # store most recent Pico output
 
 server_shell_enabled = False  # toggle state
 
 UPLOAD_DIR = "firmware/"
+WIRELESS_INTERFACE = "wlo1mon" # CHANGE ME ToDo
 
-API_KEY = "supersecretkey"  # store safely, not in code ToDo
 
 def require_key(f):
     @wraps(f)
@@ -129,7 +130,7 @@ def exec_command():
     cmd = data.get("command", "")
 
     if not server_shell_enabled:
-        return jsonify({"output": "💀 Server shell is DISABLED. Use enable_shell first."})
+        return jsonify({"output": "Server shell is DISABLED. Use enable_shell first."})
 
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -167,7 +168,7 @@ def terminate_proc(proc):
     except Exception:
         pass
 
-def start_hostapd(iface="wlo1", ssid="DuckRosaAP", password="SecretPass123"):
+def start_hostapd(iface=WIRELESS_INTERFACE, ssid="DuckRosaAP", password="SecretPass123"):
     tmp = tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".conf")
     tmp.write(HOSTAPD_CONF.format(iface=iface, ssid=ssid, password=password))
     tmp.close()
@@ -176,7 +177,7 @@ def start_hostapd(iface="wlo1", ssid="DuckRosaAP", password="SecretPass123"):
     atexit.register(lambda: terminate_proc(proc))
     return proc
 
-def start_dnsmasq(iface="wlo1"):
+def start_dnsmasq(iface=WIRELESS_INTERFACE):
     tmp = tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".conf")
     tmp.write(DNSMASQ_CONF.format(iface=iface))
     tmp.close()
@@ -185,7 +186,7 @@ def start_dnsmasq(iface="wlo1"):
     atexit.register(lambda: terminate_proc(proc))
     return proc
 
-def configure_ip(iface="wlo1"):
+def configure_ip(iface=WIRELESS_INTERFACE):
     # Bring interface down first
     subprocess.run(["sudo", "ip", "link", "set", iface, "down"])
     # Assign static IP
@@ -198,7 +199,7 @@ def configure_ip(iface="wlo1"):
 # Main
 # -----------------------------
 if __name__ == "__main__":
-    AP_IFACE = "wlo1"       # your AP-capable interface
+    AP_IFACE = WIRELESS_INTERFACE       # your AP-capable interface
     AP_SSID = "DuckRosaAP"
     AP_PASSWORD = "SecretPass123"
 
