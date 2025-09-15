@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# aMiscreant
 """
 DuckRosa HostAP + Flask C2
 --------------------------
@@ -6,16 +7,15 @@ DuckRosa HostAP + Flask C2
 - Runs a safe Flask fake-terminal server
 - Devices (e.g., Pico W) can connect and poll payloads
 """
-
-import subprocess
-import tempfile
+import atexit
 import os
 import signal
-import atexit
+import subprocess
+import tempfile
 import time
 from functools import wraps
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 
 # -----------------------------
 # Flask server setup
@@ -25,7 +25,11 @@ app = Flask(__name__)
 last_command = "" # store last command sent
 last_result = ""  # store most recent Pico output
 
-API_KEY = "supersecretkey"  # store safely, not in code
+server_shell_enabled = False  # toggle state
+
+UPLOAD_DIR = "firmware/"
+
+API_KEY = "supersecretkey"  # store safely, not in code ToDo
 
 def require_key(f):
     @wraps(f)
@@ -92,6 +96,49 @@ def firmware_files(filename):
     Example: /firmware/nuke.uf2
     """
     return send_from_directory(UPLOAD_DIR, filename, as_attachment=True)
+
+@app.route("/terminalcmd", methods=["POST"])
+@require_key
+def terminal_cmd():
+    """
+    Handle raw input typed into the server shell.
+    Some are special (enable_shell / disable_shell), others just log.
+    """
+    global server_shell_enabled
+    data = request.json
+    cmd = data.get("command", "").strip()
+
+    if cmd == "enable_shell":
+        server_shell_enabled = True
+        print("[Server Shell] ENABLED")
+        return jsonify({"status": "ok", "message": "Server shell enabled"})
+
+    if cmd == "disable_shell":
+        server_shell_enabled = False
+        print("[Server Shell] DISABLED")
+        return jsonify({"status": "ok", "message": "Server shell disabled"})
+
+    print(f"[Shell Command Requested] {cmd}")
+    return jsonify({"status": "ok"})
+
+@app.route("/exec", methods=["POST"])
+@require_key
+def exec_command():
+    global server_shell_enabled
+    data = request.json
+    cmd = data.get("command", "")
+
+    if not server_shell_enabled:
+        return jsonify({"output": "💀 Server shell is DISABLED. Use enable_shell first."})
+
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        output = result.stdout + result.stderr
+    except Exception as e:
+        output = str(e)
+
+    return jsonify({"output": output})
+
 
 # -----------------------------
 # HostAPD setup
